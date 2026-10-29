@@ -30,3 +30,4 @@ uv venv .venv && uv pip install --python .venv -r requirements.txt pytest
 - [ADR-001](docs/decisions/ADR-001-fonte-de-dados-do-mvp.md): a fonte do MVP
 - [ADR-002](docs/decisions/ADR-002-cache-semanal-partilhada.md): proposta de cache semanal partilhada
 - [Esquema de saída](docs/esquema-de-saida.md): os campos de cada contrato e as regras de normalização
+- [Eval dos resumos por LLM](docs/evals-resumos.md): Haiku vs Opus em 50 contratos, juiz, calibração e próximos passos
