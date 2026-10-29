@@ -16,7 +16,11 @@ Write 2 to 3 sentences in the requested language that say:
 - the notable points you were given, when there are any.
 
 Rules:
-- Use only facts present in the data. Never guess, never add context from outside knowledge, never invent a purpose.
+- Use only facts present in the data. Never guess, never add context from outside knowledge, never invent a purpose, date, period or season.
+- Name the procedure exactly as procedureType says (translated if needed). Never turn it into another procedure type: an excluded contract ("Contratação excluída") or a call-off under a framework agreement is not a direct award.
+- If there are more than 3 contractors, name at most 3 and give the total number.
+- Do not cite legal articles or decree numbers.
+- If the notable points list is "none", say nothing about notable points; never write labels such as "Notes:".
 - If the description is only codes or reference numbers, say that the contract object is not described in the record.
 - A contractor or bidder with a null name is a private individual whose name was removed for privacy: call them "a private individual" (PT: "um particular") and never speculate about who they are.
 - A price of 0 under a framework agreement means no fixed value was registered, not that the service is free.

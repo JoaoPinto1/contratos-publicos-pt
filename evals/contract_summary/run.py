@@ -18,6 +18,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from types import SimpleNamespace
 
 import anthropic
 
@@ -77,24 +78,39 @@ def append(path, row):
         f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def run_case(client, case, rep, model, variant_dir, timeout_s):
+def reused(reuse_dir, prompt_id, rep):
+    """Resumo já gerado noutra corrida, para re-avaliar só com um juiz novo (o resumo fica igual)."""
+    old = next(r for r in map(json.loads, open(reuse_dir / "results.jsonl", encoding="utf-8"))
+               if r["prompt_id"] == prompt_id and r["rep"] == rep)
+    trace = json.load(open(reuse_dir / "traces" / f"{prompt_id}_rep{rep}.json", encoding="utf-8"))
+    resp = SimpleNamespace(model=old["model"], stop_reason=old["stop_reason"],
+                           usage=SimpleNamespace(**old["usage"]))
+    return old, (trace[2]["content"] if old["status"] == "ok" else ""), resp, trace[:3]
+
+
+def run_case(client, case, rep, model, variant_dir, timeout_s, reuse_dir=None):
     c, language = case["contract"], case["language"]
     key = {"prompt_id": case["prompt_id"], "rep": rep}
     deadline = time.monotonic() + timeout_s
     t0 = time.monotonic()
-    try:
-        (summary, resp), retries = with_retries(lambda: summarize(client, c, language, model), deadline)
-        latency = time.monotonic() - t0
-        if not resp.model.startswith(model):
-            raise RuntimeError(f"served model {resp.model} != requested {model}")
-        status, stop = "ok", resp.stop_reason
-    except SummaryError as e:
-        # Recusa ou corte: resultado graduável, não erro de infraestrutura.
-        resp, summary, retries, latency = e.response, "", 0, time.monotonic() - t0
-        status, stop = ("truncated" if e.response.stop_reason == "max_tokens" else "refused"), e.response.stop_reason
-    except Exception as e:  # infra: vai para errors.jsonl, nunca para results.jsonl
-        append(variant_dir / "errors.jsonl", {**key, "failure_class": type(e).__name__, "error": str(e)[:500]})
-        return
+    old_trace = None
+    if reuse_dir:
+        old, summary, resp, old_trace = reused(reuse_dir, case["prompt_id"], rep)
+        status, stop, retries, latency = old["status"], old["stop_reason"], old["retries"], old["latency_s"]
+    else:
+        try:
+            (summary, resp), retries = with_retries(lambda: summarize(client, c, language, model), deadline)
+            latency = time.monotonic() - t0
+            if not resp.model.startswith(model):
+                raise RuntimeError(f"served model {resp.model} != requested {model}")
+            status, stop = "ok", resp.stop_reason
+        except SummaryError as e:
+            # Recusa ou corte: resultado graduável, não erro de infraestrutura.
+            resp, summary, retries, latency = e.response, "", 0, time.monotonic() - t0
+            status, stop = ("truncated" if e.response.stop_reason == "max_tokens" else "refused"), e.response.stop_reason
+        except Exception as e:  # infra: vai para errors.jsonl, nunca para results.jsonl
+            append(variant_dir / "errors.jsonl", {**key, "failure_class": type(e).__name__, "error": str(e)[:500]})
+            return
 
     notable = notable_points(c)
     facts_ok, facts_problems = check_facts(summary, c, language)
@@ -114,14 +130,15 @@ def run_case(client, case, rep, model, variant_dir, timeout_s):
     grade = {"pass": float(facts_ok and crit["faithful"] and crit["core"]), "facts": float(facts_ok),
              **{k: float(v) for k, v in crit.items()}, "refused": float(status == "refused")}
     reasons["facts"] = "; ".join(facts_problems) or "ok"
-    user_msg = build_user_message(c, language)
+    # Ao re-avaliar, o trace mantém o prompt que gerou o resumo, não o atual.
+    user_msg = old_trace[1]["content"] if old_trace else build_user_message(c, language)
     row = {**key, "prompt": user_msg, "tags": case["tags"], "status": status, "stop_reason": stop,
            "grade": grade, "explanation": reasons, "model": resp.model, "usage": usage_dict(resp.usage),
            "judge_model": JUDGE_MODEL if judge_usage else None, "judge_usage": judge_usage,
            "latency_s": round(latency, 2), "words": len(summary.split()), "retries": retries,
            "meta": {"language": language, "contract_id": c["id"]}}
-    trace = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user_msg},
-             {"role": "assistant", "content": summary or f"({status})"}]
+    trace = old_trace or [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user_msg},
+                          {"role": "assistant", "content": summary or f"({status})"}]
     if judge_usage:
         trace += [{"role": "system", "content": "[judge] " + JUDGE_SYSTEM},
                   {"role": "user", "content": "[judge] " + judge_prompt(c, notable, language, summary)},
@@ -178,6 +195,8 @@ def main():
     ap.add_argument("--judge-selftest", action="store_true", help="testa o juiz com 3 resumos maus e sai")
     ap.add_argument("--backend", choices=["api", "claude-code"], default="api",
                     help="claude-code usa a subscrição via 'claude -p' (grátis, números indicativos)")
+    ap.add_argument("--reuse-from", type=Path,
+                    help="pasta de uma variante já corrida: reutiliza os resumos e só volta a correr o juiz")
     args = ap.parse_args()
     if not re.fullmatch(r"baseline|v\d+", args.variant):
         sys.exit("--variant tem de ser 'baseline' ou 'vN' (o relatório ignora outros nomes)")
@@ -209,7 +228,8 @@ def main():
     if args.judge_selftest:
         judge_selftest(client, cases)
     with ThreadPoolExecutor(args.concurrency) as pool:
-        list(pool.map(lambda t: run_case(client, t[0], t[1], args.model, variant_dir, args.timeout_s), todo))
+        list(pool.map(lambda t: run_case(client, t[0], t[1], args.model, variant_dir, args.timeout_s,
+                                         args.reuse_from), todo))
     summary_line(variant_dir, args.backend)
 
 

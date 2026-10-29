@@ -63,14 +63,21 @@ def check_facts(summary, contract, language):
 
 CRITERIA = {
     "faithful": "Every factual claim in the summary is supported by the contract data or the notable points. "
-                "No invented purpose, context, entity, amount, date or role; buyer and contractor are not swapped; "
-                "a private individual is not named or speculated about.",
+                "No invented purpose, context, entity, amount, date, period or role; buyer and contractor are not "
+                "swapped; the procedure type is not turned into a different one (e.g. an excluded contract or a "
+                "call-off under a framework agreement described as a 'direct award'); a private individual is not "
+                "named or speculated about. NOT errors (the summarizer is told to do these): calling a party whose "
+                "name is null 'a private individual' (names of individuals are removed from the data for privacy); "
+                "a brief, accurate plain-language explanation of the procedure type; translating names or terms "
+                "into the requested language.",
     "core": "The summary states (a) what is being bought, or that the object is not described when the data only "
             "has codes, (b) the contracting entity, (c) the contractor(s), and (d) the price.",
     "notable": "The summary mentions every notable point listed (or there are none). A point counts as mentioned "
                "if its meaning is conveyed, even in other words.",
     "clear": "The summary is written in the requested language, in 2 to 3 sentences of plain prose (no markdown, "
-             "no bullet points, no preamble), and is understandable by a non-specialist.",
+             "no bullet points, no preamble, no labels like 'Notes:', no comments about the notable points "
+             "themselves), and is understandable by a non-specialist. A long list of names or legal article "
+             "citations that makes a sentence hard to read counts against clarity.",
 }
 
 JUDGE_SYSTEM = """You grade one summary of a Portuguese public contract against a fixed rubric.
