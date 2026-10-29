@@ -5,6 +5,7 @@
     "description": "Pesquisa os contratos públicos portugueses do Portal BASE e devolve dados limpos e normalizados.",
     "version": "0.1",
     "buildTag": "latest",
+    "defaultMemoryMbytes": 1024,
     "input": "./input_schema.json",
     "storages": {
         "dataset": "./dataset_schema.json"

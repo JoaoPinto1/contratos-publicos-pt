@@ -49,12 +49,14 @@
         "minPrice": {
             "title": "Preço mínimo (EUR)",
             "type": "integer",
+            "description": "Só contratos com preço contratual igual ou superior.",
             "minimum": 0,
             "editor": "number"
         },
         "maxPrice": {
             "title": "Preço máximo (EUR)",
             "type": "integer",
+            "description": "Só contratos com preço contratual igual ou inferior.",
             "minimum": 0,
             "editor": "number"
         },
