@@ -14,7 +14,9 @@ Dataset: "Contratos Públicos – Portal Base – IMPIC – Contratos de 2012 a 
 ### `contratos2026.zip` (versão de 25 out 2026)
 - O zip tem 47 MB e o `Contratos2026.json` lá dentro tem 356 MB: uma lista de **199 701** objetos, em UTF-8.
 - O `dataPublicacao` vai de 2025-12-04 a 2026-10-24, ou seja, o dump está atrasado ~5 dias. São ~20–25 mil contratos por mês.
-- `idcontrato` é o mesmo ID do Portal BASE (crescente). Há **1 033 IDs repetidos** no ficheiro, por isso é preciso deduplicar.
+- `idcontrato` é o mesmo ID do Portal BASE (crescente).
+- Há **1 033 linhas extra**, de 1 021 IDs repetidos com até 4 cópias cada. Parecem vir de um join no export: as cópias só diferem em
+  `ContratEcologico` (710) e em `TipoCriterioAdjudicacao` (311). Ao deduplicar, os valores destes dois campos juntam-se em vez de se escolher um.
 
 | Campo | Preenchido | Formato / nota |
 |---|---|---|
@@ -68,5 +70,4 @@ Com `size=500` vieram só 20 resultados; o máximo real está por confirmar.
 ## 3. Por confirmar
 - O máximo do `size` na pesquisa e quanto tempo dura o bloqueio da firewall.
 - Se a firewall bloqueia IPs de datacenter, como os do Apify, logo à primeira.
-- O formato dos dumps de anúncios (para a decisão entre contratos e anúncios).
 - O cliente não oficial do GitHub (provavelmente usa o mesmo endpoint).

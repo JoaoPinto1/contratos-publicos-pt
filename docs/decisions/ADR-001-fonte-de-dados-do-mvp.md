@@ -1,7 +1,7 @@
 # ADR-001: Dumps semanais do IMPIC como fonte do MVP
 
 ## Status
-Proposed
+Accepted (29 out 2026). O MVP é sobre **contratos** celebrados; os anúncios ficam para depois.
 
 ## Date
 2026-10-29
@@ -34,4 +34,4 @@ O URL do dump é obtido em cada execução pela API de metadados do dados.gov.pt
 - O atraso de até ~7 dias tem de ser explicado no README do actor. Para contratos já celebrados, isso é aceitável.
 - Cada execução descarrega ~50 MB e processa ~360 MB de JSON, o que custa memória e tempo no Apify. Ainda falta medir quanto.
 - Os pedidos de anos anteriores precisam de mais do que um ficheiro, ou seja, várias descargas.
-- Continua em aberto se o MVP é sobre contratos ou sobre anúncios. Os anúncios têm um dump com o mesmo formato, por isso esta decisão aplica-se aos dois.
+- Os anúncios têm um dump com o mesmo formato, por isso, quando entrarem no actor, esta decisão aplica-se também a eles.
