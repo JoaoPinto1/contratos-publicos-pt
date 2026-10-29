@@ -12,6 +12,7 @@ import json
 import math
 import random
 import re
+import shutil
 import sys
 import threading
 import time
@@ -20,15 +21,19 @@ from pathlib import Path
 
 import anthropic
 
+from evals.contract_summary.claude_code_client import ClaudeCodeClient, ClaudeCodeRateLimit
 from evals.contract_summary.graders import JUDGE_MODEL, check_facts, judge, judge_prompt, JUDGE_SYSTEM
 from src.summarize import SYSTEM, SummaryError, build_user_message, notable_points, summarize
 
 ROOT = Path(__file__).resolve().parents[2]
 FLOW = ROOT / ".claude" / "hillclimb" / "contract_summary"
+# Resultados via subscrição (claude -p) ficam noutra pasta: nunca se misturam com os números da API.
+FLOW_CC = FLOW.parent / "contract_summary_cc"
 CASES = Path(__file__).parent / "cases.jsonl"
 # $/1M tokens (input, output), da tabela de preços da API (out 2026); cache: escrita 1.25x, leitura 0.1x do input.
 PRICES = {"claude-haiku-5-5": (0.10, 0.50), "claude-sonnet-5-5": (2.00, 10.00), "claude-opus-5-5": (4.00, 20.00)}
-RETRIABLE = (anthropic.RateLimitError, anthropic.InternalServerError, anthropic.APIConnectionError, anthropic.APITimeoutError)
+RETRIABLE = (anthropic.RateLimitError, anthropic.InternalServerError, anthropic.APIConnectionError,
+             anthropic.APITimeoutError, ClaudeCodeRateLimit)
 lock = threading.Lock()
 
 
@@ -127,7 +132,7 @@ def run_case(client, case, rep, model, variant_dir, timeout_s):
     append(variant_dir / "results.jsonl", row)
 
 
-def summary_line(variant_dir):
+def summary_line(variant_dir, backend):
     rows = [json.loads(l) for l in open(variant_dir / "results.jsonl", encoding="utf-8")]
     n = len(rows)
     print(f"\n{variant_dir.name}: {n} casos")
@@ -138,6 +143,8 @@ def summary_line(variant_dir):
     app = sum(cost(r["model"], r["usage"]) for r in rows)
     jud = sum(cost(r["judge_model"], r["judge_usage"]) for r in rows if r["judge_usage"])
     lat = sorted(r["latency_s"] for r in rows)
+    if backend == "claude-code":
+        print("  (subscrição: o custo abaixo é uma estimativa a preços de API, não um valor pago)")
     print(f"  custo resumos ${app:.4f} (${app / n:.5f}/resumo) | juiz ${jud:.4f} | latência mediana {lat[n // 2]:.1f}s"
           f" | palavras mediana {sorted(r['words'] for r in rows)[n // 2]}")
     errors = variant_dir / "errors.jsonl"
@@ -169,18 +176,24 @@ def main():
     ap.add_argument("--concurrency", type=int, default=5)
     ap.add_argument("--approve-harness", action="store_true")
     ap.add_argument("--judge-selftest", action="store_true", help="testa o juiz com 3 resumos maus e sai")
+    ap.add_argument("--backend", choices=["api", "claude-code"], default="api",
+                    help="claude-code usa a subscrição via 'claude -p' (grátis, números indicativos)")
     args = ap.parse_args()
     if not re.fullmatch(r"baseline|v\d+", args.variant):
         sys.exit("--variant tem de ser 'baseline' ou 'vN' (o relatório ignora outros nomes)")
 
-    approved = FLOW / ".harness_sha"
+    out = FLOW_CC if args.backend == "claude-code" else FLOW
+    out.mkdir(parents=True, exist_ok=True)
+    if out != FLOW:
+        shutil.copyfile(FLOW / "_state.json", out / "_state.json")
+    approved = out / ".harness_sha"
     sha = harness_sha()
     if args.approve_harness:
         approved.write_text(sha)
     elif not approved.exists() or approved.read_text().strip() != sha:
         sys.exit("O runner, os graders ou o prompt mudaram desde a última aprovação. Revê-os e corre com --approve-harness.")
 
-    variant_dir = FLOW / args.variant
+    variant_dir = out / args.variant
     variant_dir.mkdir(parents=True, exist_ok=True)
     done = set()
     if (variant_dir / "results.jsonl").exists():
@@ -189,12 +202,15 @@ def main():
     todo = [(c, rep) for c in cases for rep in range(args.reps) if (c["prompt_id"], rep) not in done]
     print(f"{len(todo)} execuções a fazer ({len(done)} já feitas) com {args.model}")
 
-    client = anthropic.Anthropic(max_retries=0, timeout=args.timeout_s)  # as repetições são feitas aqui, com registo
+    if args.backend == "claude-code":
+        client = ClaudeCodeClient(timeout=args.timeout_s)
+    else:
+        client = anthropic.Anthropic(max_retries=0, timeout=args.timeout_s)  # as repetições são feitas aqui, com registo
     if args.judge_selftest:
         judge_selftest(client, cases)
     with ThreadPoolExecutor(args.concurrency) as pool:
         list(pool.map(lambda t: run_case(client, t[0], t[1], args.model, variant_dir, args.timeout_s), todo))
-    summary_line(variant_dir)
+    summary_line(variant_dir, args.backend)
 
 
 if __name__ == "__main__":

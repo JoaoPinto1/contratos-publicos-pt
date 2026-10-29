@@ -19,6 +19,7 @@
   "harness_paths": [
     "evals/contract_summary/run.py",
     "evals/contract_summary/graders.py",
+    "evals/contract_summary/claude_code_client.py",
     "evals/contract_summary/cases.jsonl",
     "src/summarize.py",
     "requirements.txt"
