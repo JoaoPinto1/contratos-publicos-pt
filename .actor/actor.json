@@ -1,8 +1,8 @@
 {
     "actorSpecification": 1,
     "name": "contratos-publicos-pt",
-    "title": "Contratos Públicos PT (Portal BASE)",
-    "description": "Pesquisa os contratos públicos portugueses do Portal BASE e devolve dados limpos e normalizados.",
+    "title": "Portugal Public Contracts (Portal BASE)",
+    "description": "Search every public contract signed in Portugal (contratos públicos, Portal BASE) by keyword, buyer, supplier, NIF, CPV code, price or date. Clean structured data, a daily new-contracts mode, and names of private individuals removed.",
     "version": "0.1",
     "buildTag": "latest",
     "defaultMemoryMbytes": 1024,
