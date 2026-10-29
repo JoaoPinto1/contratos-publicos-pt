@@ -15,8 +15,13 @@ BATCH = 500
 
 
 def years_to_read(date_from, date_to, available):
-    # Cada ficheiro anual traz contratos publicados até ~1 mês antes do início desse ano, por isso lê-se também o ano seguinte.
-    first, last = int(date_from[:4]), int(date_to[:4]) + 1
+    """Ficheiros anuais a ler para um intervalo de datas de publicação.
+
+    O ano do ficheiro é o do contrato, não o da publicação: o ficheiro de 2026 traz publicações desde dez/2025,
+    e os de 2025 e 2024 trazem ~12% das publicações de 2026.
+    shortcut: ficheiros com 3+ anos de atraso (~0.7% das publicações) ficam de fora; ver ADR-002.
+    """
+    first, last = int(date_from[:4]) - 2, int(date_to[:4]) + 1
     return [y for y in sorted(available) if first <= y <= last]
 
 
@@ -44,13 +49,21 @@ async def main():
             return
 
         found = {}
+        skipped = 0
         for year in years:
             Actor.log.info(f"A ler o dump de {year}")
             await Actor.set_status_message(f"A ler os contratos de {year}")
             for row in iter_rows(urls[year]):
-                if int(row["idcontrato"]) <= last_id:
+                try:
+                    if int(row["idcontrato"]) <= last_id:
+                        continue
+                    c = normalize(row)
+                except (KeyError, ValueError, TypeError, AttributeError) as e:
+                    # Uma linha mal formada no dump não pode estragar a execução inteira.
+                    skipped += 1
+                    if skipped <= 5:
+                        Actor.log.warning(f"Linha ignorada ({type(e).__name__}: {e}): {str(row)[:200]}")
                     continue
-                c = normalize(row)
                 if not matches(c):
                     continue
                 if c["id"] in found:
@@ -58,6 +71,9 @@ async def main():
                         Actor.log.warning(f"Contrato {c['id']} repetido com campos diferentes; fica a primeira cópia")
                 else:
                     found[c["id"]] = c
+
+        if skipped:
+            Actor.log.warning(f"{skipped} linhas do dump ignoradas por estarem mal formadas")
 
         # Incremental: do mais antigo para o mais recente, para o marcador ficar certo se o maxItems cortar a lista.
         items = sorted(found.values(), key=lambda c: int(c["id"]), reverse=not only_new)[:max_items]
