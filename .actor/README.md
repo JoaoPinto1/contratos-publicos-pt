@@ -107,6 +107,12 @@ A typical run takes 1–2 minutes and reads a full year of data.
 - Search works on the contract description, which is the text the public entity wrote. Search for the words they would use, in Portuguese.
 - `isLikelyPerson` is a heuristic. In rare cases a company with an unusual name is hidden, or the reverse.
 
+## Source code
+
+The code is open source on GitHub: [JoaoPinto1/contratos-publicos-pt](https://github.com/JoaoPinto1/contratos-publicos-pt).
+The repository also explains how the data source was chosen and how each field is normalized.
+Bugs and suggestions: open an issue there or in the **Issues** tab of this page.
+
 ---
 
 ## Em português
@@ -119,4 +125,4 @@ Pesquise todos os contratos públicos celebrados em Portugal, publicados no Port
 - **Privacidade:** o nome dos adjudicatários que são pessoas singulares é removido.
 - **Preço:** paga por contrato devolvido. O campo **Máximo de contratos** limita o custo de cada execução.
 
-Este actor não tem qualquer ligação ao IMPIC nem ao Portal BASE.
+Este actor não tem qualquer ligação ao IMPIC nem ao Portal BASE. O código é aberto: [github.com/JoaoPinto1/contratos-publicos-pt](https://github.com/JoaoPinto1/contratos-publicos-pt).
