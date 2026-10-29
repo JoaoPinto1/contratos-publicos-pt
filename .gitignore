@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Apify local run storage
+storage/
+apify_storage/
+
+# Dumps descarregados (centenas de MB)
+data/
+*.zip
+
+# Segredos
+.env
+.env.*
