@@ -99,12 +99,13 @@ This actor goes further: when a contractor or bidder looks like a private indivi
 
 You pay per contract returned (see the **Pricing** tab). Use **Máximo de contratos** (`maxItems`) to cap the cost of each run.
 
-A typical run takes 1–2 minutes and reads a full year of data.
+A typical run takes about 4–5 minutes. It reads three yearly files, because many contracts are published months or years after they are signed.
 
 ## Limitations
 
 - Contracts only. Open tenders (anúncios) are not included yet.
 - Search works on the contract description, which is the text the public entity wrote. Search for the words they would use, in Portuguese.
+- About 0.7% of contracts are published three or more years after the contract year. A search over recent dates does not include them.
 - `isLikelyPerson` is a heuristic. In rare cases a company with an unusual name is hidden, or the reverse.
 
 ## Source code

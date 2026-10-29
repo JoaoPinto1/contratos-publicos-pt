@@ -8,12 +8,13 @@ com pay-per-event: $0.003 por contrato e $0.01 por GB no arranque. Publicar uma 
 
 ## Como funciona
 Em cada execução, o actor:
-1. Descarrega o dump semanal do IMPIC (dados.gov.pt) de cada ano do intervalo pedido.
+1. Descarrega os dumps semanais do IMPIC (dados.gov.pt): o ano da pesquisa e os 2 anteriores, porque muitos contratos são publicados anos depois.
 2. Lê o ficheiro em streaming, normaliza e filtra cada contrato.
 3. Deduplica e guarda os resultados no dataset.
 
 Com `onlyNew`, guarda o último `id` devolvido num key-value store com nome, um marcador para cada combinação de filtros.
-Uma execução para um ano demora ~20 s e usa ~75 MB de memória.
+Uma execução que lê 3 ficheiros demora ~1 min localmente e ~4–5 min no Apify com 1 GB, e usa ~75 MB de memória.
+Erros de rede são repetidos com backoff, e as linhas mal formadas do dump são ignoradas e contadas no log.
 Os dados chegam com até ~7 dias de atraso.
 
 ## Comandos
@@ -26,4 +27,5 @@ uv venv .venv && uv pip install --python .venv -r requirements.txt pytest
 ## Documentação
 - [Fontes de dados](docs/fontes-de-dados.md): os dumps do IMPIC e o endpoint interno do BASE
 - [ADR-001](docs/decisions/ADR-001-fonte-de-dados-do-mvp.md): a fonte do MVP
+- [ADR-002](docs/decisions/ADR-002-cache-semanal-partilhada.md): proposta de cache semanal partilhada
 - [Esquema de saída](docs/esquema-de-saida.md): os campos de cada contrato e as regras de normalização

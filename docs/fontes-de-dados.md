@@ -14,7 +14,21 @@ Dataset: "Contratos Públicos – Portal Base – IMPIC – Contratos de 2012 a 
 ### `contratos2026.zip` (versão de 25 out 2026)
 - O zip tem 47 MB e o `Contratos2026.json` lá dentro tem 356 MB: uma lista de **199 701** objetos, em UTF-8.
 - O `dataPublicacao` vai de 2025-12-04 a 2026-10-24, ou seja, o dump está atrasado ~5 dias. São ~20–25 mil contratos por mês.
-- `idcontrato` é o mesmo ID do Portal BASE (crescente).
+- `idcontrato` é o mesmo ID do Portal BASE. Cresce com a data de publicação, e isso confirma-se também
+  entre ficheiros: em 225 076 publicações de 2026, espalhadas pelos ficheiros de 2024, 2025 e 2026, não há nenhuma fora de ordem.
+- **O ano do ficheiro é o ano do contrato (`Ano`), não o ano da publicação.** Há muitos contratos publicados anos depois.
+  As publicações de 2026 (até 24 out) estão espalhadas assim:
+
+  | Ficheiro | Publicações de 2026 |
+  |---|---|
+  | contratos2026 | ~170 mil (e ainda ~3 mil de dez/2025) |
+  | contratos2025 | ~23 mil (9,5 mil só em janeiro) |
+  | contratos2024 | ~2,4 mil |
+  | contratos2023 | ~1 mil |
+  | contratos2022 | ~200 |
+
+  O actor lê o ano da pesquisa, os 2 anteriores e o seguinte (ver `years_to_read`). Cobre ~99,3% das publicações.
+  O resto está no [ADR-002](decisions/ADR-002-cache-semanal-partilhada.md).
 - Há **1 033 linhas extra**, de 1 021 IDs repetidos com até 4 cópias cada. Parecem vir de um join no export: as cópias só diferem em
   `ContratEcologico` (710) e em `TipoCriterioAdjudicacao` (311). Ao deduplicar, os valores destes dois campos juntam-se em vez de se escolher um.
 
