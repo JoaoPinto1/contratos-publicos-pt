@@ -1,0 +1,26 @@
+{
+  "flow": "contract_summary",
+  "description": "Resumo de 2–3 frases de um contrato público (src/summarize.py), Haiku 5.5 vs Opus 5.5, juiz Sonnet 5.5",
+  "metrics": [
+    {"id": "pass", "label": "Pass", "kind": "binary"},
+    {"id": "faithful", "label": "Fiel", "kind": "binary"},
+    {"id": "core", "label": "Essencial", "kind": "binary"},
+    {"id": "facts", "label": "Factos (código)", "kind": "binary"},
+    {"id": "notable", "label": "Destaques", "kind": "binary"},
+    {"id": "clear", "label": "Claro", "kind": "binary"},
+    {"id": "refused", "label": "Recusou", "kind": "binary"}
+  ],
+  "perf_fields": ["latency_s", "words", "usage"],
+  "prices": {
+    "claude-haiku-5-5": {"in": 0.10, "out": 0.50},
+    "claude-sonnet-5-5": {"in": 2.00, "out": 10.00},
+    "claude-opus-5-5": {"in": 4.00, "out": 20.00}
+  },
+  "harness_paths": [
+    "evals/contract_summary/run.py",
+    "evals/contract_summary/graders.py",
+    "evals/contract_summary/cases.jsonl",
+    "src/summarize.py",
+    "requirements.txt"
+  ]
+}

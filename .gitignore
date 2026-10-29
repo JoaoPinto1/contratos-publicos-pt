@@ -15,3 +15,9 @@ data/
 # Segredos
 .env
 .env.*
+
+# Eval: traces e relatórios gerados ficam fora do git
+.claude/hillclimb/**/traces/
+.claude/hillclimb/**/report.html
+.claude/hillclimb/**/trajectory/
+.claude/hillclimb/**/.harness_sha
