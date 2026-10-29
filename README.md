@@ -3,7 +3,8 @@
 Um actor do Apify que pesquisa os contratos públicos portugueses do Portal BASE e devolve dados limpos.
 Mais tarde vai também gerar resumos por LLM e funcionar como MCP server.
 
-Estado: MVP a correr localmente; ainda não está publicado no Apify.
+Estado: MVP publicado na Apify Store em [apify.com/joaopinto/contratos-publicos-pt](https://apify.com/joaopinto/contratos-publicos-pt),
+com pay-per-event: $0.003 por contrato e $0.01 por GB no arranque. Publicar uma versão nova: `apify push`.
 
 ## Como funciona
 Em cada execução, o actor:

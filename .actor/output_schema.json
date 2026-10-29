@@ -1,0 +1,12 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Portugal public contracts",
+    "properties": {
+        "contracts": {
+            "type": "string",
+            "title": "Contracts",
+            "description": "One item per public contract, with the fields described in the README.",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+    }
+}
