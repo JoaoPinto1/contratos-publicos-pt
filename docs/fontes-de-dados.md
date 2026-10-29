@@ -68,6 +68,8 @@ Com `size=500` vieram só 20 resultados; o máximo real está por confirmar.
 - O `version` provavelmente muda com cada deploy do site.
 
 ## 3. Por confirmar
-- O máximo do `size` na pesquisa e quanto tempo dura o bloqueio da firewall.
+- O máximo do `size` na pesquisa.
+- Quanto tempo dura o bloqueio da firewall: são pelo menos 40 minutos, porque o IP bloqueado por volta das 17:50 ainda estava bloqueado às 18:30, até na página de detalhe.
+- O formato do URL de detalhe `/Base4/pt/detalhe/?type=contratos&id=…` (não deu para confirmar por causa do bloqueio).
 - Se a firewall bloqueia IPs de datacenter, como os do Apify, logo à primeira.
 - O cliente não oficial do GitHub (provavelmente usa o mesmo endpoint).
