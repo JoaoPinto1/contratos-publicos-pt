@@ -4,7 +4,8 @@ Um actor do Apify que pesquisa os contratos públicos portugueses do Portal BASE
 Mais tarde vai também gerar resumos por LLM e funcionar como MCP server.
 
 Estado: MVP publicado na Apify Store em [apify.com/joaopinto/contratos-publicos-pt](https://apify.com/joaopinto/contratos-publicos-pt),
-com pay-per-event: $0.003 por contrato e $0.01 por GB no arranque. Publicar uma versão nova: `apify push`.
+com pay-per-event: $0.003 por contrato e $0.02 por GB no arranque.
+O arranque cobre o custo de plataforma de uma execução (~$0.014 a ler 3 ficheiros), para não perder dinheiro em execuções com poucos resultados. Publicar uma versão nova: `apify push`.
 
 ## Como funciona
 Em cada execução, o actor:
