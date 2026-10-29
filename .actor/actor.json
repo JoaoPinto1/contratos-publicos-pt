@@ -1,0 +1,13 @@
+{
+    "actorSpecification": 1,
+    "name": "contratos-publicos-pt",
+    "title": "Contratos Públicos PT (Portal BASE)",
+    "description": "Pesquisa os contratos públicos portugueses do Portal BASE e devolve dados limpos e normalizados.",
+    "version": "0.1",
+    "buildTag": "latest",
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "dockerfile": "../Dockerfile"
+}

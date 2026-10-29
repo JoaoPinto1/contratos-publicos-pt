@@ -1,0 +1,76 @@
+{
+    "title": "Pesquisa de contratos públicos",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "keywords": {
+            "title": "Palavras-chave",
+            "type": "string",
+            "description": "Termos a procurar na descrição do contrato. Todos têm de aparecer; não distingue maiúsculas nem acentos.",
+            "editor": "textfield",
+            "prefill": "software"
+        },
+        "contractingEntity": {
+            "title": "Entidade adjudicante",
+            "type": "string",
+            "description": "NIF (9 dígitos) ou parte do nome, por exemplo \"Município de Coimbra\".",
+            "editor": "textfield"
+        },
+        "contractor": {
+            "title": "Adjudicatário",
+            "type": "string",
+            "description": "NIF (9 dígitos) ou parte do nome da empresa.",
+            "editor": "textfield"
+        },
+        "cpvPrefixes": {
+            "title": "Códigos CPV",
+            "type": "array",
+            "description": "Prefixos de CPV, por exemplo \"48\" (software) ou \"72\" (serviços de TI).",
+            "editor": "stringList"
+        },
+        "procedureTypes": {
+            "title": "Tipos de procedimento",
+            "type": "array",
+            "description": "Por exemplo \"Concurso público\", \"Ajuste direto\", \"Consulta prévia\".",
+            "editor": "stringList"
+        },
+        "dateFrom": {
+            "title": "Publicado desde",
+            "type": "string",
+            "description": "Data de publicação no BASE (AAAA-MM-DD). Por omissão, há 30 dias.",
+            "editor": "datepicker"
+        },
+        "dateTo": {
+            "title": "Publicado até",
+            "type": "string",
+            "description": "Data de publicação no BASE (AAAA-MM-DD). Por omissão, hoje.",
+            "editor": "datepicker"
+        },
+        "minPrice": {
+            "title": "Preço mínimo (EUR)",
+            "type": "integer",
+            "minimum": 0,
+            "editor": "number"
+        },
+        "maxPrice": {
+            "title": "Preço máximo (EUR)",
+            "type": "integer",
+            "minimum": 0,
+            "editor": "number"
+        },
+        "onlyNew": {
+            "title": "Só contratos novos",
+            "type": "boolean",
+            "description": "Devolve só os contratos que ainda não foram devolvidos por uma execução anterior com os mesmos filtros. Útil para agendar o actor.",
+            "default": false
+        },
+        "maxItems": {
+            "title": "Máximo de contratos",
+            "type": "integer",
+            "description": "Limite de resultados por execução.",
+            "minimum": 1,
+            "default": 1000,
+            "editor": "number"
+        }
+    }
+}

@@ -55,8 +55,7 @@ Campos do dump que ficam de fora no MVP: `idprocedimento`, `idINCM`, `TipoAnunci
   (por exemplo `"- - EBSCO Information Services S.L.U."` é uma empresa e `"- - José Teixeira Moreira"` é uma pessoa).
 - **`bidders`:** a origem tem pelo menos 6 formatos (`"504615947-1 - MEO ..."`, `"514181435-GROWSKILLS ..."`,
   `"-- Nome"`, `"999999999- Nome"`, `"999999999-999999999"`, …). Os 9 primeiros dígitos são o NIF; um sufixo `-N` a seguir ao NIF deita-se fora; o resto é o nome.
-  Se um valor não encaixar em nenhum formato, guarda-se `{nif: null, name: <texto original>}` e conta-se num log.
-  Nunca se perde o valor.
+  Se um valor não encaixar em nenhum formato, o texto todo fica como `name`, e a regra RGPD aplica-se na mesma: na dúvida, o nome fica oculto.
 
 ## Deduplicação
 

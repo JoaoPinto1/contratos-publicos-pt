@@ -1,0 +1,24 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Contratos",
+            "transformation": {
+                "fields": ["publicationDate", "description", "procedureType", "contractingEntities", "contractors", "priceEur", "url"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "publicationDate": { "label": "Publicação", "format": "date" },
+                    "description": { "label": "Objeto", "format": "text" },
+                    "procedureType": { "label": "Procedimento", "format": "text" },
+                    "contractingEntities": { "label": "Adjudicante", "format": "object" },
+                    "contractors": { "label": "Adjudicatário", "format": "object" },
+                    "priceEur": { "label": "Preço (EUR)", "format": "number" },
+                    "url": { "label": "BASE", "format": "link" }
+                }
+            }
+        }
+    }
+}
